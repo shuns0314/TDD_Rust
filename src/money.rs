@@ -1,3 +1,5 @@
+
+
 #[derive(Debug,PartialEq)]
 struct Doller {
     pub amount: i32
@@ -8,27 +10,30 @@ struct Franc {
     pub amount: i32
 }
 
-trait Money<T> {
+trait Money<T: Money<T>> {
+    fn amount(&mut self) -> &i32;
     fn times(&mut self, multiplier: &'static i32) -> Self;
-    fn eqauls(&mut self, money: &T) -> bool;
+    fn eqauls(&mut self, money: &mut T) -> bool{
+        return self.amount() == money.amount();
+    }
 }
 
 
 impl Money<Doller> for Doller {
+    fn amount(&mut self) -> &i32 {
+        return &self.amount;
+    }
     fn times(&mut self, multiplier: &'static i32) -> Doller{
         return Doller {amount: self.amount * multiplier}
-    }
-    fn eqauls(&mut self, money: &Doller) -> bool {
-        return money.amount == self.amount;
     }
 }
 
 impl Money<Franc> for Franc {
+    fn amount(&mut self) -> &i32 {
+        return &self.amount;
+    }
     fn times(&mut self, multiplier: &'static i32) -> Franc{
         return Franc {amount: self.amount * multiplier}
-    }
-    fn eqauls(&mut self, money: &Franc) -> bool {
-        return money.amount == self.amount;
     }
 }
 
@@ -48,8 +53,8 @@ mod test{
     #[test]
     fn test_equals(){
         let mut doller = Doller {amount: 5};
-        assert!(doller.eqauls(&Doller {amount: 5}));
-        assert!(!doller.eqauls(&Doller {amount: 6}));
+        assert!(doller.eqauls(&mut Doller {amount: 5}));
+        assert!(!doller.eqauls(&mut Doller {amount: 6}));
     }
 
     #[test]
